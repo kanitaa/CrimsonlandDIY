@@ -39,31 +39,26 @@ public class RaycastShoot : MonoBehaviour
         bulletAmount = weapon.bulletAmount;
         shotDuration = new WaitForSeconds(weapon.shotDuration);
 
-        bulletAmountText = AimIndicator.instance.transform.GetChild(0).GetComponent<TextMeshProUGUI>();
+        bulletAmountText = GameManager.instance.aim.transform.GetChild(0).GetComponent<TextMeshProUGUI>();
         bulletAmountText.text = bulletAmount.ToString();
     }
 
     // Update is called once per frame
     void Update()
     {
+        //if mousebutton is released during rapid fire, stop shooting
         if (Input.GetMouseButtonUp(0) && weapon.weaponName == "P90" && bulletAmount!=0)
         {
-         
             StopAllCoroutines();
-
         }
         if (!EventSystem.current.IsPointerOverGameObject())
         {
-            
-            //if pressing mousebutton and able to shoot based on weapons firerate
+            //if holding mousebutton and able to shoot based on weapons firerate
             if (Input.GetMouseButton(0) && weapon.weaponName == "P90" && bulletAmount != 0)
             {
                 StartCoroutine(ShootMachineGun());
                 
             }
-           
-
-
 
             //if pressing mousebutton and able to shoot based on weapons firerate
             if (Input.GetMouseButtonDown(0) && Time.time > nextFire && weapon.weaponName != "P90" && bulletAmount!=0)
@@ -73,7 +68,7 @@ public class RaycastShoot : MonoBehaviour
         }
     }
 
-
+    //rapid fire, firerate between autoshots
     IEnumerator ShootMachineGun()
     {
         while(bulletAmount > 0)
@@ -88,8 +83,8 @@ public class RaycastShoot : MonoBehaviour
     {
         bulletAmount--;
         bulletAmountText.text = bulletAmount.ToString();
-        GameManager.instance.IncreaseLevelShots();
-        StartCoroutine(ShotEffect());
+        GameManager.instance.IncreaseLevelShots(); //for level stats tracking
+        StartCoroutine(ShotEffect()); //visual laserline for shot
 
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
         //start point of line renderer
@@ -98,20 +93,7 @@ public class RaycastShoot : MonoBehaviour
         //end point of laserline
         if (Physics.Raycast(ray, out RaycastHit hit))
         {
-            float dist = Vector3.Distance(hit.point, transform.position);
-
-
-            if (dist < 10)
-            {
-                AimIndicator.instance.startSize = dist * 10;
-            } else if (dist < 15)
-            {
-                AimIndicator.instance.startSize = dist * 8;
-            } else if (dist > 20)
-            {
-                AimIndicator.instance.startSize = dist * 6;
-            }
-            AimIndicator.instance.StartLerping();
+            GameManager.instance.aim.ShowAim(); //show aim indicator based on distance
 
             //if player hits enemy
             if (hit.transform.GetComponent<Enemy>() != null)
@@ -126,7 +108,7 @@ public class RaycastShoot : MonoBehaviour
                     hit.transform.GetComponent<Enemy>().TakeDamage(weaponDamage);
                 }
             }
-            else //player misses
+            else //player misses, give gamemanager info for accuracy tracking
             {
                 GameManager.instance.ShotsMissed();
             }
@@ -136,7 +118,7 @@ public class RaycastShoot : MonoBehaviour
             laserLine.SetPosition(1, new Vector3(hit.point.x, 3, hit.point.z));
 
         }
-       
+       //out of bullets, start to reload weapon
         if (bulletAmount == 0)
         {
             StopAllCoroutines();
@@ -153,14 +135,15 @@ public class RaycastShoot : MonoBehaviour
         laserLine.enabled = false;
     }
 
+    //weapon reload time
     private IEnumerator ReloadWeapon()
     {
         GameManager.instance.reloadingWeapon = true;
-        AimIndicator.instance.OutOfAmmoTexture();
+        GameManager.instance.aim.OutOfAmmoTexture();
         yield return new WaitForSeconds(weapon.reloadTime);
-        bulletAmount=weapon.bulletAmount;
+        bulletAmount=weapon.bulletAmount; //set bullets back to full based on weapon bullet amount
         bulletAmountText.text = bulletAmount.ToString();
-        AimIndicator.instance.AmmoAvailableTexture();
-        GameManager.instance.reloadingWeapon = false;
+        GameManager.instance.aim.AmmoAvailableTexture();
+        GameManager.instance.reloadingWeapon = false; //let gamemanager know reloading is over
     }
 }

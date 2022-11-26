@@ -51,7 +51,7 @@ public class WeaponManager : MonoBehaviour
         //if there is already old weapon, destroy it to avoid multiple weapons
         if (playerController.currentWeapon != null)
         {
-            AimIndicator.instance.GetComponent<Image>().enabled = false;
+            GameManager.instance.aim.GetComponent<Image>().enabled = false;
             Destroy(playerController.weaponSlot.gameObject.transform.GetChild(0).gameObject);
         }
       
@@ -68,9 +68,10 @@ public class WeaponManager : MonoBehaviour
     
     }
 
-
+    //used after level is cleared to show new unlock in end panel
     public void SetWeaponUnlock()
     {
+        currentWeapon.SetActive(false);
         //if level is 2 or 3, unlock weapon from list that is one index smaller than current level
         if(GameManager.instance.currentLevel==2 || GameManager.instance.currentLevel == 3)
         {
@@ -86,7 +87,7 @@ public class WeaponManager : MonoBehaviour
         {
             weaponPanel.SetActive(true);
             Time.timeScale = 0;
-            AimIndicator.instance.GetComponent<Image>().enabled = false;
+            GameManager.instance.aim.GetComponent<Image>().enabled = false;
         }
         else
         {

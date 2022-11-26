@@ -24,7 +24,11 @@ public class GameManager : MonoBehaviour
     WeaponManager weaponManager;
     [SerializeField]
     UIManager uiManager;
+
    
+    public AimIndicator aim;
+
+
     public delegate void EnablePowerup();
     public static event EnablePowerup OnPowerEnable;
 
@@ -62,12 +66,15 @@ public class GameManager : MonoBehaviour
            
        
     }
+
+    //find managers and init values when level changes
     public void FindManagers()
     {
         CancelInvoke();
         Time.timeScale = 1;
         weaponManager = GameObject.FindGameObjectWithTag("Managers").GetComponent<WeaponManager>();
         uiManager = GameObject.FindGameObjectWithTag("LevelUI").GetComponent<UIManager>();
+        aim = uiManager.transform.GetChild(3).GetComponent<AimIndicator>();
 
 
         //init values back to zero
@@ -95,9 +102,9 @@ public class GameManager : MonoBehaviour
     //use power up
     public void PowerUp(float time)
     {
-        CancelInvoke();
-        OnPowerEnable();
-        currentTimer = time;
+        CancelInvoke(); //cancels previous timer if there is one
+        OnPowerEnable(); //call OnPowerEnable(), playercontroller reacts to this
+        currentTimer = time; //number value for the timer
         timerValue = 0.0f;
         valueToAdd = 6 / time; //Number of segments divided by time
        
@@ -105,12 +112,12 @@ public class GameManager : MonoBehaviour
         InvokeRepeating("UpdateTimer",0,1); //Invoke function until timer is gone, update values within function
         
     }
+    //timer for powerups
     void UpdateTimer()
     {
-       
-        uiManager.powerUpTimer.text = currentTimer.ToString();
-        uiManager.powerUpBackground.GetComponent<Image>().material.SetFloat("_RemovedSegments", timerValue);
-        if (currentTimer == 0)
+        uiManager.powerUpTimer.text = currentTimer.ToString(); //"clock" timer
+        uiManager.powerUpBackground.GetComponent<Image>().material.SetFloat("_RemovedSegments", timerValue); //background of timer, change shader graphs value
+        if (currentTimer == 0) //power up timer ran out, disable powerup
         {
             CancelInvoke();
             uiManager.powerUpBackground.SetActive(false);
@@ -133,6 +140,8 @@ public class GameManager : MonoBehaviour
     {
         shotsMissed++;
     }
+
+    //accuracy for player shots
     public string GetLevelAccuracy()
     {
         if (shotsMissed != 0)
@@ -157,6 +166,7 @@ public class GameManager : MonoBehaviour
         return levelKills.ToString();
     }
 
+    //time played current level in minutes and seconds
     public string GetLevelTime()
     {
         int levelTime = Mathf.RoundToInt(Time.timeSinceLevelLoad);
@@ -215,7 +225,7 @@ public class GameManager : MonoBehaviour
         }
 
     }
-
+    //check which weapon was used the longest time and get its name and sprite for ui purposes
     public string GetFavouriteWeaponName()
     {
         float maxValue = weaponTimers.Max();

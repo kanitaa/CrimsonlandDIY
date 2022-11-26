@@ -12,7 +12,6 @@ public class AimIndicator : MonoBehaviour
     [SerializeField]
     CharacterController cc;
 
-    public static AimIndicator instance;
     [SerializeField]
     Texture2D aimTexture;
 
@@ -33,12 +32,10 @@ public class AimIndicator : MonoBehaviour
 
     private void Start()
     {
-        AimIndicator.instance = this;
-
-        endSize = 25;
+        endSize = 25;  //default sizes for aim indicator
         startSize = 100;
     }
-    public void StartLerping()
+    public void ShowAim()
     {
         timeWhenStart = Time.time;
         shouldChangeSize = true;
@@ -50,10 +47,31 @@ public class AimIndicator : MonoBehaviour
     {
         if (shouldChangeSize)
         {
-          
+            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+            if (Physics.Raycast(ray, out RaycastHit hit))
+            {
+                float dist = Vector3.Distance(hit.point, cc.transform.position);
+
+                //resize aimindicator based on distance from player
+                if (dist < 10)
+                {
+                    startSize = dist * 12;
+                }
+                else if (dist < 15)
+                {
+                    startSize = dist * 8;
+                }
+                else if (dist > 20)
+                {
+                    startSize = dist * 6;
+                }
+
+            }
+            //change indicator to new size with lerp function
             GetComponent<RectTransform>().SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, Lerp(startSize, endSize, timeWhenStart, timeWhenEnd));
             GetComponent<RectTransform>().SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, Lerp(startSize, endSize, timeWhenStart, timeWhenEnd));
 
+            //if size is min size, lerp function has ended
             if (GetComponent<RectTransform>().sizeDelta.x==25)
             {
                 GetComponent<Image>().enabled = false;
@@ -62,8 +80,10 @@ public class AimIndicator : MonoBehaviour
         }
  
         transform.position = Input.mousePosition;
+       
     }
 
+    //lerp aim indicators size between two values
   public float Lerp(float start, float end, float timeStartedSizeChange, float lerpTime = 1)
     {
         float timeSinceStarted = Time.time - timeStartedSizeChange;
@@ -74,6 +94,8 @@ public class AimIndicator : MonoBehaviour
 
         return result;
     }
+
+    //change cursor texture depending if theres ammo or no
     public void OutOfAmmoTexture()
     {
         Cursor.SetCursor(noAmmoTexture, new Vector2(12, 8.5f), CursorMode.Auto);

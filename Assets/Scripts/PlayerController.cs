@@ -1,53 +1,58 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class PlayerController : MonoBehaviour
 {
-    CharacterController controller;
     [SerializeField]
+    UIManager uiManager;
+    CharacterController controller;
+    
+    //movement speed variables
     private float moveSpeed;
+    [SerializeField]
+    float normalSpeed;
+    [SerializeField]
+    float powerSpeed;
     private Vector3 moveDirection = Vector3.zero;
 
-    [SerializeField]
+   //weaponmanager needs to access these
     public GameObject weaponSlot;
-
-    
     public Weapon currentWeapon;
+
+
+    [SerializeField]
     int health;
 
   
+    //power variables, powers name needs to match the one in enum
     public string power;  
     enum Powers { Speed, Forcefield, Kappa };
 
     [SerializeField]
     private GameObject forcefield;
 
-    [SerializeField]
-    UIManager uiManager;
+   
 
     void Start()
     {
-        health = 100;
         controller = GetComponent<CharacterController>();
+        moveSpeed = normalSpeed;
+        //add player power up functions to gamemanager
         GameManager.OnPowerDisable += DisablePowerUps;
         GameManager.OnPowerEnable += EnablePowerUp;
 
-
     }
 
-    // Update is called once per frame
+ 
     void Update()
     {
 
-      
           moveDirection = new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical"));
           moveDirection *= moveSpeed;
           controller.Move(moveDirection * Time.deltaTime);
        
-     
-      
-
         //rotate to raycast
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
         Plane groundPlane = new Plane(Vector3.up, Vector3.zero);
@@ -59,32 +64,30 @@ public class PlayerController : MonoBehaviour
             transform.LookAt(new Vector3(hit.x, transform.position.y,hit.z));
         }
 
-     
-
     }
 
+    //check which power up is hit and do the power effect
     void EnablePowerUp()
     {
-       
-        for (int i = 0; i < 2; i++)
-        {
             if (power == Powers.Kappa.ToString())
             {
                 Debug.Log(power);
-                return;
+               
             }else if (power == Powers.Forcefield.ToString())
             {
                 forcefield.SetActive(true);
-                return;
+              
             }
             else if(power== Powers.Speed.ToString())
             {
                
-                moveSpeed = 15;
-                return;
+                moveSpeed = powerSpeed;
+               
             }
-        }
+        
     }
+
+    //disable all powerups
     void DisablePowerUps()
     {
         if (forcefield.activeInHierarchy)
@@ -92,20 +95,23 @@ public class PlayerController : MonoBehaviour
             forcefield.SetActive(false);
         }
        
-        moveSpeed = 10;    
+        moveSpeed = normalSpeed;    
         
         power = "";
         Debug.Log("Power up over");
 
       
     }
+
+    //change players health, works for damage and heals, send info to uimanager
     public void ChangeHealth(int hp)
     {
         health += hp;
         uiManager.ChangeHealthValue(hp);
-        Debug.Log("health changed: " + hp);
+       
         if (health <= 0)
         {
+            //player dies, do something
             Debug.Log("ded");
             
         }
@@ -121,5 +127,12 @@ public class PlayerController : MonoBehaviour
             power = other.GetComponent<PowerUp>().GetPowerUpType();
             Destroy(other.gameObject);
         }
+    }
+
+    //remove functions from delegate or else they will be added second time when level changes because gamemanager stays the same
+    private void OnDestroy()
+    {
+        GameManager.OnPowerDisable -= DisablePowerUps;
+        GameManager.OnPowerEnable -= EnablePowerUp;
     }
 }

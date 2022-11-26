@@ -46,13 +46,11 @@ public class UIManager : MonoBehaviour
 
     private void Start()
     {
+        //init some ui values
         powerUpTimer = powerUpBackground.transform.GetChild(0).GetComponent<TextMeshProUGUI>();
         healthValue = 0;
         health.material.SetFloat("_RemovedSegments", healthValue);
-        SetupUIReferencesAndButtonClicks();
-      
-       
-            
+        SetupUIReferencesAndButtonClicks();     
     
     }
     //function to increase progress in the level
@@ -62,9 +60,8 @@ public class UIManager : MonoBehaviour
         if (progressBar.value >= 100)
         {
             //level cleared
-            progressBar.value = 0;
-            GameManager.instance.currentLevel++;
-            weaponManager.SetWeaponUnlock();
+            GameManager.instance.currentLevel++; //increase level
+            weaponManager.SetWeaponUnlock();  //unlock new weapon and show end panel
             ShowLevelEndPanel();
 
         }
@@ -140,10 +137,15 @@ public class UIManager : MonoBehaviour
     void ShowLevelEndPanel()
     {
         Time.timeScale = 0; //stop time when level is over
-        AimIndicator.instance.GetComponent<Image>().enabled = false;
+        GameManager.instance.aim.GetComponent<Image>().enabled = false;
         SetupLevelEndValues();
         levelEndPanel.SetActive(true);
         unlock.SetActive(true);
-        //TO DO hide extra UI stuff
+        //hide extra UI stuff
+        progressBar.gameObject.SetActive(false);
+        powerUpBackground.SetActive(false);
+        health.gameObject.SetActive(false);
+        GameManager.instance.aim.gameObject.SetActive(false);
+
     }
 }

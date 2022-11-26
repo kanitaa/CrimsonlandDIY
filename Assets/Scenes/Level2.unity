@@ -317,6 +317,11 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 98969493}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!143 &139505857 stripped
+CharacterController:
+  m_CorrespondingSourceObject: {fileID: 8595145848265677348, guid: 9ce48c171910829498b71e9e54860158, type: 3}
+  m_PrefabInstance: {fileID: 2122248783}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &187827690
 GameObject:
   m_ObjectHideFlags: 0
@@ -2112,6 +2117,10 @@ PrefabInstance:
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
       value: EquipWeapon
       objectReference: {fileID: 0}
+    - target: {fileID: 5661862538955220452, guid: 76e8a659fbc29d44bb6d33d38efe14fe, type: 3}
+      propertyPath: cc
+      value: 
+      objectReference: {fileID: 139505857}
     - target: {fileID: 5661862539117566868, guid: 76e8a659fbc29d44bb6d33d38efe14fe, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
@@ -2200,8 +2209,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e8349806ecf0db64bb84408e39b785a8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  weaponPanel: {fileID: 1411865441}
   playerController: {fileID: 2122248787}
+  weaponPanel: {fileID: 1411865441}
   currentWeapon: {fileID: 1411865442}
   weaponRef:
   - {fileID: 1411865439}
