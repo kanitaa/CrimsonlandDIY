@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0061a38df27aeb54abf29be8b9290b09, type: 3}
+  m_Name: Rifle
+  m_EditorClassIdentifier: 
+  weaponName: Rifle
+  weaponPrefab: {fileID: 8571717822946195450, guid: a45f4518fc93e0a4a886d81405db0ca7, type: 3}
+  weaponSprite: {fileID: 21300000, guid: 115296a5985a23a46ab58d71224f1c59, type: 3}
+  weaponDescription: Shoot faster bullet but lower damage
+  bulletAmount: 30
+  bulletDamage: 10
+  fireRate: 0.1
+  shotDuration: 0.1
+  reloadTime: 4
