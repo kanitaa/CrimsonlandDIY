@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -23,26 +24,32 @@ public class PlayerController : MonoBehaviour
 
 
     [SerializeField]
-    int health;
+    float health;
 
   
     //power variables, powers name needs to match the one in enum
     public string power;  
-    enum Powers { Speed, Forcefield, Kappa };
+    enum Powers { Speed, Forcefield, Freeze, Mushroom };
 
     [SerializeField]
     private GameObject forcefield;
 
-   
+    AudioSource audioS;
+    [SerializeField]
+    AudioClip deathClip;
 
+    bool godMode;
+
+    public bool mushroomPower;
     void Start()
     {
         controller = GetComponent<CharacterController>();
         moveSpeed = normalSpeed;
+        health = GameManager.instance.GetPlayerHealth();
+        audioS=GetComponent<AudioSource>();
         //add player power up functions to gamemanager
         GameManager.OnPowerDisable += DisablePowerUps;
         GameManager.OnPowerEnable += EnablePowerUp;
-
     }
 
  
@@ -64,14 +71,31 @@ public class PlayerController : MonoBehaviour
             transform.LookAt(new Vector3(hit.x, transform.position.y,hit.z));
         }
 
+        if (Input.GetKeyDown(KeyCode.P))
+        {
+            if (!godMode)
+            {
+                godMode = true;
+            }
+            else
+            {
+                godMode = false;
+            }
+
+        }
+
     }
 
     //check which power up is hit and do the power effect
     void EnablePowerUp()
     {
-            if (power == Powers.Kappa.ToString())
+            if (power == Powers.Freeze.ToString())
             {
-                Debug.Log(power);
+            for(int i=0; i< GameManager.instance.spawner.enemiesSpawned.Count; i++)
+            {
+                GameManager.instance.spawner.enemiesSpawned[i].gameObject.GetComponent<Enemy>().Freeze();
+            }
+               
                
             }else if (power == Powers.Forcefield.ToString())
             {
@@ -83,6 +107,12 @@ public class PlayerController : MonoBehaviour
                
                 moveSpeed = powerSpeed;
                
+            }else if(power== Powers.Mushroom.ToString())
+            {
+                mushroomPower = true;
+                weaponSlot.GetComponentInChildren<RaycastShoot>().mushroomPower = mushroomPower;
+                transform.localScale = new Vector3(1.5f, 1.5f, 1.5f);
+                transform.position = new Vector3(transform.position.x, 1, transform.position.z);
             }
         
     }
@@ -95,8 +125,19 @@ public class PlayerController : MonoBehaviour
             forcefield.SetActive(false);
         }
        
-        moveSpeed = normalSpeed;    
-        
+        moveSpeed = normalSpeed;
+        for (int i = 0; i < GameManager.instance.spawner.enemiesSpawned.Count; i++)
+        {
+            GameManager.instance.spawner.enemiesSpawned[i].gameObject.GetComponent<Enemy>().UnFreeze();
+        }
+
+        if (power == "Mushroom")
+        {
+            mushroomPower = false;
+            weaponSlot.GetComponentInChildren<RaycastShoot>().mushroomPower = mushroomPower;
+            transform.localScale = new Vector3(1, 1, 1);
+            transform.position = new Vector3(transform.position.x, 0, transform.position.z);
+        }
         power = "";
         Debug.Log("Power up over");
 
@@ -104,26 +145,29 @@ public class PlayerController : MonoBehaviour
     }
 
     //change players health, works for damage and heals, send info to uimanager
-    public void ChangeHealth(int hp)
+    public void ChangeHealth(float hp)
     {
+        if (forcefield.activeInHierarchy || godMode) return;
         health += hp;
-        uiManager.ChangeHealthValue(hp);
+        GameManager.instance.SetPlayerHealth(hp);
        
         if (health <= 0)
         {
             //player dies, do something
-            Debug.Log("ded");
-            
+            audioS.PlayOneShot(deathClip);
+          
+             
+            uiManager.ShowDeathPanel();
+            GameManager.instance.DeathDataReset();
+
         }
 
     }
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.gameObject.CompareTag("PowerUp"))
+        if (other.gameObject.CompareTag("PowerUp") && power=="")
         {
-            //disable old power up before activing new one
-            DisablePowerUps();
             power = other.GetComponent<PowerUp>().GetPowerUpType();
             Destroy(other.gameObject);
         }

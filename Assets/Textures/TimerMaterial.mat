@@ -73,7 +73,7 @@ Material:
     - _OcclusionStrength: 1
     - _Parallax: 0.02
     - _Radius: -0.5
-    - _RemovedSegments: 5.9999995
+    - _RemovedSegments: 1.8000001
     - _Rotation: 180
     - _SegmentCount: 6
     - _SegmentSpacing: 0.01

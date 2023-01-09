@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0061a38df27aeb54abf29be8b9290b09, type: 3}
+  m_Name: P90
+  m_EditorClassIdentifier: 
+  weaponName: P90
+  weaponPrefab: {fileID: 680471706883943232, guid: e5434561312767e4c87f3f2b5d0a0adb, type: 3}
+  weaponSprite: {fileID: 21300000, guid: 7d7bc6d98d1539241b545942281f0043, type: 3}
+  weaponDescription: Many bullets.. so fast.. much wow..
+  bulletAmount: 50
+  bulletDamage: 10
+  fireRate: 0.1
+  shotDuration: 0.1
+  reloadTime: 4
+  experienceMultiplier: 1
+  levelToUnlock: 3

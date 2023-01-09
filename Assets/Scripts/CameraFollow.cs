@@ -1,10 +1,13 @@
-using System.Collections;
+using Photon.Pun;
+using Photon.Realtime;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class CameraFollow : MonoBehaviour
 {
-    public Transform target;
+    [SerializeField]
+    Transform target;
 
     public float smoothSpeed = 0.125f;
     public Vector3 offset;
@@ -20,5 +23,9 @@ public class CameraFollow : MonoBehaviour
              transform.position = smoothedPos;
          
         }
+    }
+     public void SetTarget(Transform target)
+    {
+         this.target = target;
     }
 }
